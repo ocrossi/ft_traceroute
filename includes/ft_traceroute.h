@@ -50,15 +50,16 @@ typedef struct timeval		t_val;
 typedef struct			s_packetData {
 	struct iphdr		ipHeader;	// 20 len
 	struct icmphdr		icmpHeader;	// 8 len
-	char				*payload;
+	char				payload[];
 }				t_packetData;
 
 typedef struct			s_data {
 	int				ttl;
-	int				size;
+	int				payloadSize;
+  int       totalSize;
 	int				sockFd;
-	char			*test;
 	char			*destIp;
+  char      *inputDest;
 
 	t_packetData		*sendpack[3];
 	t_packetData		*retpack[3];
@@ -74,10 +75,21 @@ extern t_data data;
 void manage_args(int argc, char **argv);
 void parse_dest(int argc, char **argv);
 
+/* SOCKET */
+void create_socket(void);
+
+/* CONSTRUCT & SEND */ 
+void construct_headers(t_packetData *data, int index);
+void send_packets(void);
+
+/* RECIEVE */
+void recieve_packets(void);
+
 /* OUTPUT */
 void print_usage(void);
 void print_incorrect_args(char *arg);
 void print_interrupt(int signum);
+void print_probes_data(void);
 
 
 

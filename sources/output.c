@@ -22,3 +22,18 @@ void print_interrupt(int signum) {
 	dprintf(1, "interrupt detected\n");
 	exit(0);
 }
+
+void print_head(void) {
+  dprintf(1, "traceroute to %s (%s): %d hops max, %d bytes packets\n", data.inputDest, data.destIp, MAX_HOPS, data.totalSize);
+}
+
+void display_address_packet(int index) {
+  dprintf(1, "in display address payload plz %s\n", data.retpack[index]->payload);
+  
+}
+
+void print_probes_data(void) {
+  for (int i = 0; i < 3; i++) {
+    display_address_packet(i);
+  }
+}

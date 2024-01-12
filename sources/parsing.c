@@ -20,6 +20,7 @@ void test_dest(char *arg) {
 	h = (struct sockaddr_in *)res->ai_addr;
 	inet_ntop(AF_INET, &h->sin_addr, buff, INET_ADDRSTRLEN);
 	// printf("buff %s\n", buff);
+  data.inputDest = ft_strdup(arg);
 	data.destIp = ft_strdup(buff);
 	data.networkIp  = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
 	ft_memcpy(data.networkIp, h, sizeof(struct sockaddr_in));
@@ -43,7 +44,7 @@ void test_packetlen(char *plen) {
 		fprintf(stderr, "too big packetlen %d specified\n", ft_atoi(plen));
 		exit(0);
 	}
-	data.size = ft_atoi(plen);
+	data.totalSize = ft_atoi(plen);
 }
 
 void parse_dest(int argc, char **argv) {
@@ -51,8 +52,10 @@ void parse_dest(int argc, char **argv) {
 	if (argc > 2) {
 		test_packetlen(argv[2]);
 	} else {
-		data.size = 60;
-	} 
+		data.totalSize = 60;
+	}
+  data.payloadSize = data.totalSize - sizeof(struct icmphdr) - sizeof(struct iphdr);
+  printf("payload size = %d\n", data.payloadSize);
 }
 
 void check_help_flag(int argc, char **argv) {
