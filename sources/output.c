@@ -1,4 +1,6 @@
 #include "../includes/ft_traceroute.h"
+#include <arpa/inet.h>
+#include <netdb.h>
 
 void print_incorrect_args(char* arg) {
 	dprintf(1, "Extra arg `%s' (position 3, argc 3)\n", arg);
@@ -28,8 +30,30 @@ void print_head(void) {
 }
 
 void display_address_packet(int index) {
-  dprintf(1, "in display address payload plz %s\n", data.retpack[index]->payload);
-  
+	t_packetData *packet = data.retpack[index];
+
+	struct sockaddr_in temp;
+	socklen_t len;
+	char buff[NI_MAXHOST];
+	
+	temp.sin_family = AF_INET;
+	temp.sin_addr.s_addr = packet->ipHeader.saddr;
+	len = sizeof(temp);
+
+	if (!getnameinfo((struct sockaddr*)&temp, len, buff, sizeof(buff), NULL, 0, NI_NAMEREQD)) {
+		dprintf(1, "gimme address return %s\n", buff);
+	} else {
+		dprintf(1, "wesh %d\n", index);
+	}
+	//
+	// unsigned short source port = ntohs((unsigned short *)(packet+8));
+	//
+	// struct in_addr addr;
+	// addr.s_addr = packet->udpHeader.source;
+	// char *ip = inet_ntoa(addr);
+	//
+	// dprintf(1, "ip ret = %s\n", ip);
+
 }
 
 void print_probes_data(void) {

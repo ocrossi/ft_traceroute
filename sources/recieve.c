@@ -19,19 +19,20 @@ bool recieve_packet(int index) {
 	if (bytesRecieved < 0) {
 		return false;
 	} else {
-		// printf("===========================================\n");
-		// printf("we've recieved %lu\n", bytesRecieved);
-		// printf("wait data total size = %d\n", data.totalSize);
-		//   print_memory(recieve, bytesRecieved, 16);
-		// printf("===========================================\n");
+		printf("===========================================\n");
+		printf("we've recieved %lu\n", bytesRecieved);
+		print_memory(recieve, bytesRecieved, 16);
+		printf("===========================================\n");
 	}
 	data.retpack[index] = (t_packetData *)malloc(bytesRecieved);
 	ft_memcpy(data.retpack[index], recieve, bytesRecieved);
-	// data->recievedBytesArray = (char *)malloc(	bytesRecieved);
-	// ft_memcpy(data->recievedBytesArray, recieve, bytesRecieved);
 	gettimeofday(&data.recieveTime[index], NULL);
-	// data->retPrintSize = bytesRecieved;
-  printf("can we check payload from here ? %s\n", data.retpack[index]->payload);
+	
+	unsigned short source_port = ntohs(*(unsigned short *)(recieve + 8));
+	dprintf(1, "source port %hu\n", source_port);
+	t_packetData *testRcv = (t_packetData *)recieve;
+	// char *ip = inet_ntoa(testRcv->udpHeader.source);
+	dprintf(1, "TODO display source port from ret pack with inet_ntoa\n");
 	return true;
 }
 

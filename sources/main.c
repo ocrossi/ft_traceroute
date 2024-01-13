@@ -18,15 +18,18 @@ int main(int argc, char **argv)
 	parse_dest(argc, argv);
 	set_signals();
 	init_data();
-  print_head();
-	while (data.ttl < 2) {
-	  construct_packets();
+	print_head();
+	construct_packets();
+	//while (data.ttl < 2) {
+		data.ttl = 4;
 		send_packets();
+		dprintf(1, "wait\n");
 		recieve_packets();
-    print_probes_data();
-    // free probs data
+		print_probes_data();
+		// free probs data
 		data.ttl++;
-	}
+		//change send packets data for ttl
+	//}
 	// send packets
 	// parse return 
 	// display

@@ -15,12 +15,12 @@ void test_dest(char *arg) {
 	if ((ret = getaddrinfo(arg, NULL, &hints, &res)) != 0) {
 		fprintf(stderr, "%s: %s\n", arg, gai_strerror(ret));
 		fprintf(stderr, "Cannot handle \"host\" cmdline arg %s on position 1 (argc 1)\n", arg);
-		exit(0);
+	exit(0);
 	}
 	h = (struct sockaddr_in *)res->ai_addr;
 	inet_ntop(AF_INET, &h->sin_addr, buff, INET_ADDRSTRLEN);
 	// printf("buff %s\n", buff);
-  data.inputDest = ft_strdup(arg);
+	data.inputDest = ft_strdup(arg);
 	data.destIp = ft_strdup(buff);
 	data.networkIp  = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
 	ft_memcpy(data.networkIp, h, sizeof(struct sockaddr_in));
@@ -54,8 +54,8 @@ void parse_dest(int argc, char **argv) {
 	} else {
 		data.totalSize = 60;
 	}
-  data.payloadSize = data.totalSize - sizeof(struct icmphdr) - sizeof(struct iphdr);
-  printf("payload size = %d\n", data.payloadSize);
+	data.payloadSize = data.totalSize - sizeof(struct udphdr) - sizeof(struct iphdr);
+	printf("payload size = %d\n", data.payloadSize);
 }
 
 void check_help_flag(int argc, char **argv) {

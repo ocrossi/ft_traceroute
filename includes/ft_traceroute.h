@@ -20,6 +20,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
+#include <netinet/udp.h>
 
 #include "../libraries/libft.h"
 #define MAX_INT 2147483647
@@ -46,23 +47,26 @@
 #define	UNKNOWN_ERR_CODE		"Unknown error code\n" 
 
 typedef struct timeval		t_val;
+typedef struct udphdr		t_udp;
+typedef struct iphdr		t_ip;
 
 typedef struct			s_packetData {
 	struct iphdr		ipHeader;	// 20 len
-	struct icmphdr		icmpHeader;	// 8 len
+	struct udphdr		udpHeader;	// 8 len
 	char				payload[];
 }				t_packetData;
+
 
 typedef struct			s_data {
 	int				ttl;
 	int				payloadSize;
-  int       totalSize;
+	int       totalSize;
 	int				sockFd;
 	char			*destIp;
-  char      *inputDest;
+	char      *inputDest;
 
-	t_packetData		*sendpack[3];
-	t_packetData		*retpack[3];
+	void				*sendpack[3];
+	void				*retpack[3];
 	struct sockaddr_in	*networkIp;
 	t_val			sendTime[3];
 	t_val			recieveTime[3];
@@ -79,7 +83,7 @@ void parse_dest(int argc, char **argv);
 void create_socket(void);
 
 /* CONSTRUCT & SEND */ 
-void construct_headers(t_packetData *data, int index);
+void construct_packets(void);
 void send_packets(void);
 
 /* RECIEVE */
@@ -89,6 +93,7 @@ void recieve_packets(void);
 void print_usage(void);
 void print_incorrect_args(char *arg);
 void print_interrupt(int signum);
+void print_head();
 void print_probes_data(void);
 
 
