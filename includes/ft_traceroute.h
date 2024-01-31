@@ -1,21 +1,21 @@
 #ifndef FT_TRACEROUTE_H
-# define FT_TRACEROUTE_H
+#define FT_TRACEROUTE_H
 
+#include <errno.h>
+#include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <string.h>
-#include <stdbool.h>
-#include <errno.h>
 
 #include <netdb.h>
 
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -32,46 +32,54 @@
 #define MAX_HOPS 30
 
 // errors //
-#define EICMP_DEST_UNREACH		"Destination Unreachable\n"
-#define EICMP_SOURCE_QUENCH		"Source Quench\n"
-#define EICMP_REDIRECT			"Redirect (change route)\n"
-#define EICMP_TIME_EXCEEDED		"Time to live exceeded\n"
-#define EICMP_PARAMETERPROB		"Parameter Problem\n"
-#define EICMP_TIMESTAMP			"Timestamp Request"
-#define EICMP_TIMESTAMPREPLY	"Timestamp Reply\n"
-#define EICMP_INFO_REQUEST		"Information Request\n"
-#define EICMP_INFO_REPLY		"Information Reply\n"
-#define EICMP_ADDRESS			"Address Mask Request\n"
-#define EICMP_ADDRESSREPLY		"Address Mask Reply\n"
+#define EICMP_DEST_UNREACH "Destination Unreachable\n"
+#define EICMP_SOURCE_QUENCH "Source Quench\n"
+#define EICMP_REDIRECT "Redirect (change route)\n"
+#define EICMP_TIME_EXCEEDED "Time to live exceeded\n"
+#define EICMP_PARAMETERPROB "Parameter Problem\n"
+#define EICMP_TIMESTAMP "Timestamp Request"
+#define EICMP_TIMESTAMPREPLY "Timestamp Reply\n"
+#define EICMP_INFO_REQUEST "Information Request\n"
+#define EICMP_INFO_REPLY "Information Reply\n"
+#define EICMP_ADDRESS "Address Mask Request\n"
+#define EICMP_ADDRESSREPLY "Address Mask Reply\n"
 
-#define	UNKNOWN_ERR_CODE		"Unknown error code\n" 
+#define UNKNOWN_ERR_CODE "Unknown error code\n"
 
-typedef struct timeval		t_val;
-typedef struct udphdr		t_udp;
-typedef struct iphdr		t_ip;
+#define PROBENB 3
 
-typedef struct			s_packetData {
-	struct iphdr		ipHeader;	// 20 len
-	struct udphdr		udpHeader;	// 8 len
-	char				payload[];
-}				t_packetData;
+typedef struct timeval t_val;
+typedef struct udphdr t_udp;
+typedef struct iphdr t_ip;
 
+typedef struct s_packetData {
+  struct iphdr ipHeader;     // 20 len
+  struct icmphdr icmpHeader; // 8 len
+  char payload[];
+} t_packetData;
 
-typedef struct			s_data {
-	int				ttl;
-	int				payloadSize;
-	int       totalSize;
-	int				sockFd;
-	char			*destIp;
-	char      *inputDest;
+typedef struct s_data {
+  int ttl;
+  int payloadSize;
+  int totalSize;
+  int sockFd;
+  char *destIp;
+  char *inputDest;
 
-	void				*sendpack[3];
-	void				*retpack[3];
-	struct sockaddr_in	*networkIp;
-	t_val			sendTime[3];
-	t_val			recieveTime[3];
+  t_packetData *sendpack[PROBENB];
+  t_packetData *retpack[PROBENB];
+  struct sockaddr_in *networkIp;
+  t_val sendTime[PROBENB];
+  t_val recieveTime[PROBENB];
 
-}				t_data;
+  char *resIps[PROBENB];
+  char *resDns;
+
+  int divs; // nb diff routes
+
+  double probeTimes[PROBENB];
+
+} t_data;
 
 extern t_data data;
 
@@ -82,38 +90,35 @@ void parse_dest(int argc, char **argv);
 /* SOCKET */
 void create_socket(void);
 
-/* CONSTRUCT & SEND */ 
+/* CONSTRUCT & SEND */
 void construct_packets(void);
 void send_packets(void);
 
 /* RECIEVE */
 void recieve_packets(void);
 
+/* UTILS */
+void store_times();
+
 /* OUTPUT */
+void print_times(void);
 void print_usage(void);
 void print_incorrect_args(char *arg);
 void print_interrupt(int signum);
 void print_head();
 void print_probes_data(void);
-
-
+void print_packet(char *string, int len);
 
 // typedef struct 	s_pingData {
-// 	char					options; // bits are 1 if acceptedFlag[bit_pos] est dans input
-// 	char					*strIp;
-// 	struct sockaddr_in		*networkIp;
-// 	char					*reverseDns;
-// 	t_packetData			*spacket;
-// 	int						max_ping;
-// 	int						ttl;
-// 	useconds_t				interval;
-// 	t_packetData			*rpacket;
-// 	t_val					sendTime;
-// 	t_val					recieveTime;
-// 	t_val					start_time;
-// 	double					time;
-// 	char					*error;
-// }							t_pingData;
+// 	char					options; // bits are 1 if
+// acceptedFlag[bit_pos] est dans input 	char
+// *strIp; 	struct sockaddr_in		*networkIp; 	char
+// *reverseDns; 	t_packetData			*spacket; 	int
+// max_ping; 	int						ttl;
+// useconds_t interval; 	t_packetData			*rpacket;
+// t_val sendTime; 	t_val					recieveTime;
+// t_val start_time; 	double					time; 	char
+// *error; }							t_pingData;
 //
 //
 // typedef struct 	s_statData {

@@ -1,4 +1,5 @@
 #include "../includes/ft_traceroute.h"
+#include <stdio.h>
 #include <unistd.h>
 
 bool recieve_packet(int index) {
@@ -20,22 +21,20 @@ bool recieve_packet(int index) {
   ssize_t bytesRecieved = recvfrom(data.sockFd, &recieve, MAX_PACKET_SIZE, 0,
                                    (struct sockaddr *)data.networkIp, &size);
   if (bytesRecieved < 0) {
+    dprintf(1, "cant recieve do u get timeout here?\n");
     return false;
-  } else {
-    printf("===========================================\n");
-    printf("we've recieved %lu\n", bytesRecieved);
-    print_memory(recieve, bytesRecieved, 16);
-    printf("===========================================\n");
   }
+  // else {
+  //   printf("===========================================\n");
+  //   printf("we've recieved %lu\n", bytesRecieved);
+  //   // print_memory(recieve, bytesRecieved, 16);
+  //   print_packet(recieve, bytesRecieved);
+  //   printf("===========================================\n");
+  // }
   data.retpack[index] = (t_packetData *)malloc(bytesRecieved);
   ft_memcpy(data.retpack[index], recieve, bytesRecieved);
   gettimeofday(&data.recieveTime[index], NULL);
 
-  // unsigned short source_port = ntohs(*(unsigned short *)(recieve + 8));
-  // dprintf(1, "source port %hu\n", source_port);
-  t_packetData *testRcv = (t_packetData *)recieve;
-  // char *ip = inet_ntoa(testRcv->udpHeader.source);
-  dprintf(1, "TODO display source port from ret pack with inet_ntoa\n");
   return true;
 }
 
@@ -43,4 +42,6 @@ void recieve_packets() {
   for (int i = 0; i < 3; i++) {
     recieve_packet(i);
   }
+  store_times();
+  // print_times();
 }
