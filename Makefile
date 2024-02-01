@@ -21,7 +21,7 @@ OBJS		= $(addprefix $(OBJ_PATH)/,$(NAME_OBJS))
 
 #compilateur + flags
 CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra -Werror -fsanitize=address
 
 #librairies
 #LIBFT				= $(LIB_PATH)/libft.a

@@ -15,13 +15,18 @@ void init_data(void) {
 
 void free_probes_data() {
   for (int i = 0; i < 3; i++) {
-    free(data.retpack[i]);
-    if (data.resIps[i] != NULL)
+    if (data.retpack[i] != NULL) {
+      free(data.retpack[i]);
+      data.retpack[i] = NULL;
+    }
+    if (data.resIps[i] != NULL) {
       free(data.resIps[i]);
-  }
-  if (data.resDns != NULL) {
-    free(data.resDns);
-    data.resDns = NULL;
+      data.resIps[i] = NULL;
+    }
+    if (data.resDns[i] != NULL) {
+      free(data.resDns[i]);
+      data.resDns[i] = NULL;
+    }
   }
 }
 
@@ -31,11 +36,12 @@ int main(int argc, char **argv) {
   set_signals();
   init_data();
   print_head();
-  while (data.ttl < MAX_HOPS) {
+  data.alive = true;
+  while (data.ttl < MAX_HOPS && data.alive) {
     construct_packets();
     send_packets();
     recieve_packets();
-    print_probes_data();
+    print_probes_data2();
     free_probes_data();
     data.ttl++;
   }

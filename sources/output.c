@@ -47,7 +47,21 @@ void print_head(void) {
           data.inputDest, data.destIp, MAX_HOPS, data.totalSize);
 }
 
-void store_address_packet(int index) {
+bool check_one_route() {
+  for (int i = 0; i < PROBENB; i++) {
+    if (data.recieved[i] == false)
+      return false;
+  }
+  int truth = data.retpack[0]->ipHeader.saddr;
+  for (int i = 1; i < PROBENB; i++) {
+    if (data.retpack[i]->ipHeader.saddr != truth) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void get_address(int index) {
   t_packetData *packet = data.retpack[index];
 
   struct sockaddr_in temp;
@@ -58,55 +72,58 @@ void store_address_packet(int index) {
   temp.sin_addr.s_addr = packet->ipHeader.saddr;
   len = sizeof(temp);
 
-  if (index > 0 &&
-      packet->ipHeader.saddr == data.retpack[index - 1]->ipHeader.saddr) {
-    data.resIps[index] = NULL;
-    return;
-  } else if (index != 0)
-    data.divs++;
-
-  if (index == 0 && data.divs == 0 &&
-      !getnameinfo((struct sockaddr *)&temp, len, buff, sizeof(buff), NULL, 0,
+  if (!getnameinfo((struct sockaddr *)&temp, len, buff, sizeof(buff), NULL, 0,
                    NI_NAMEREQD)) {
-    data.resDns = ft_strdup(buff);
-    // dprintf(1, "allloooooo %s\n", buff);
+    data.resDns[index] = ft_strdup(buff);
+
+    // dprintf(1, "res ip = %s\n", buff);
   }
   inet_ntop(AF_INET, &packet->ipHeader.saddr, buff, INET_ADDRSTRLEN);
   data.resIps[index] = ft_strdup(buff);
+  // dprintf(1, "res ip = %s\n", buff);
 }
 
-void construct_output_string() {
-  char *res;
-  char *tmp1;
-  char *tmp2;
+void print_single_route() {
+  get_address(0);
+  char *target = (data.resDns[0] == NULL) ? data.resIps[0] : data.resDns[0];
+  dprintf(1, "%s (%s) %.3lf ms %.3lf ms %.3lf ms\n", target, data.resIps[0],
+          data.probeTimes[0], data.probeTimes[1], data.probeTimes[2]);
+}
 
+void print_route(int index) {
+  get_address(index);
+  char *target =
+      (data.resDns[index] == NULL) ? data.resIps[index] : data.resDns[index];
+  dprintf(1, "%s (%s) %.3lf ms ", target, data.resIps[index],
+          data.probeTimes[index]);
+}
+
+// void check_dest_reached() {
+//   for (int i = 0; i < PROBENB; i++) {
+//     if (data.recieved[i] == false)
+//       continue;
+//     if (data.networkIp->sin_addr.s_addr == data.retpack[i]->ipHeader.saddr) {
+//       data.alive = false;
+//       return;
+//     }
+//   }
+// }
+
+void print_probes_data2() {
+  dprintf(1, "%d ", data.ttl);
+  // check_dest_reached();
+  if (check_one_route()) {
+    print_single_route();
+    return;
+  }
   for (int i = 0; i < PROBENB; i++) {
-    if (data.divs == 0) {
-      char *target = (data.resDns == NULL) ? data.resIps[0] : data.resDns;
-      dprintf(1, "%d %s (%s) %.3lf ms %.3lf ms %.3lf ms\n", data.ttl, target,
-              data.resIps[0], data.probeTimes[0], data.probeTimes[1],
-              data.probeTimes[2]);
-      return;
-    }
-    if (data.resIps[i] == NULL)
+    if (data.recieved[i] == false) {
+      dprintf(1, "* ");
       continue;
-    if (i == 0) {
-      dprintf(1, "%d %s (%s) %.3lf ms ", data.ttl, data.resIps[i],
-              data.resIps[i], data.probeTimes[i]);
-    } else {
-      dprintf(1, "%d %s (%s)\t%.3lf ms ", data.ttl, data.resIps[i],
-              data.resIps[i], data.probeTimes[i]);
     }
+    print_route(i);
   }
   ft_putchar('\n');
-}
-
-void print_probes_data(void) {
-  for (int i = 0; i < PROBENB; i++) {
-    store_address_packet(i);
-  }
-  construct_output_string();
-  data.divs = 0;
 }
 
 void print_times() {

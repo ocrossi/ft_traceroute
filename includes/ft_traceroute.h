@@ -65,20 +65,18 @@ typedef struct s_data {
   int sockFd;
   char *destIp;
   char *inputDest;
+  struct sockaddr_in *networkIp;
 
   t_packetData *sendpack[PROBENB];
   t_packetData *retpack[PROBENB];
-  struct sockaddr_in *networkIp;
   t_val sendTime[PROBENB];
   t_val recieveTime[PROBENB];
-
+  bool recieved[PROBENB];
   char *resIps[PROBENB];
-  char *resDns;
-
-  int divs; // nb diff routes
-
+  char *resDns[PROBENB];
   double probeTimes[PROBENB];
 
+  bool alive;
 } t_data;
 
 extern t_data data;
@@ -106,7 +104,8 @@ void print_usage(void);
 void print_incorrect_args(char *arg);
 void print_interrupt(int signum);
 void print_head();
-void print_probes_data(void);
+/* void print_probes_data(void); */
+void print_probes_data2(void);
 void print_packet(char *string, int len);
 
 // typedef struct 	s_pingData {
