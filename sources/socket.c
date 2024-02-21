@@ -9,7 +9,7 @@ void create_socket() {
   struct timeval tval;
   ft_memset(&tval, 0, sizeof(tval));
   tval.tv_sec = 0;
-  tval.tv_usec = 20000;
+  tval.tv_usec = 200000;
 
   sockFd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if (sockFd < 0) {

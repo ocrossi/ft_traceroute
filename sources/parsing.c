@@ -59,9 +59,9 @@ void parse_dest(int argc, char **argv) {
   } else {
     data.totalSize = 60;
   }
-  data.payloadSize =
-      data.totalSize - sizeof(struct udphdr) - sizeof(struct iphdr);
-  printf("payload size = %d\n", data.payloadSize);
+  // data.payloadSize =
+  //     data.totalSize - sizeof(struct udphdr) - sizeof(struct iphdr);
+  // printf("payload size = %d\n", data.payloadSize);
 }
 
 void check_help_flag(int argc, char **argv) {

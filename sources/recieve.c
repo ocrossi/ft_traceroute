@@ -25,6 +25,9 @@ bool recieve_packet(int index) {
     data.retpack[index] = NULL;
     return false;
   }
+  // else if (index == 0) {
+  //   print_packet(recieve, bytesRecieved);
+  // }
   data.retpack[index] = (t_packetData *)malloc(bytesRecieved);
   ft_memcpy(data.retpack[index], recieve, bytesRecieved);
   gettimeofday(&data.recieveTime[index], NULL);
@@ -32,10 +35,10 @@ bool recieve_packet(int index) {
   if (data.retpack[index]->icmpHeader.type == 0) {
     dprintf(1, "do we get a reply here?\n");
   }
-  dprintf(1, "ret pack type = %d code =  %d\n",
-          data.retpack[index]->icmpHeader.type,
-          data.retpack[index]->icmpHeader.code);
-
+  // dprintf(1, "ret pack type = %d code =  %d\n",
+  //         data.retpack[index]->icmpHeader.type,
+  //         data.retpack[index]->icmpHeader.code);
+  //
   return true;
 }
 

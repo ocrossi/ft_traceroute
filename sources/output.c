@@ -38,7 +38,9 @@ void print_usage(void) {
 
 void print_interrupt(int signum) {
   (void)signum;
-  dprintf(1, "interrupt detected\n");
+  free_probes_data();
+  free_sendpackets_data();
+  dprintf(1, "interrupt detected with a free?\n");
   exit(0);
 }
 
@@ -124,6 +126,14 @@ void print_probes_data2() {
     print_route(i);
   }
   ft_putchar('\n');
+}
+
+void print_probe_data(int index) {
+  if (data.recieved[index] == false) {
+    dprintf(1, "* ");
+    return;
+  }
+  print_route(index);
 }
 
 void print_times() {

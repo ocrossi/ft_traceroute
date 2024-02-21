@@ -91,12 +91,16 @@ void create_socket(void);
 /* CONSTRUCT & SEND */
 void construct_packets(void);
 void send_packets(void);
+void send_packet(int index);
 
 /* RECIEVE */
 void recieve_packets(void);
+bool recieve_packet(int index);
 
 /* UTILS */
 void store_times();
+void free_probes_data();
+void free_sendpackets_data();
 
 /* OUTPUT */
 void print_times(void);
@@ -105,7 +109,8 @@ void print_incorrect_args(char *arg);
 void print_interrupt(int signum);
 void print_head();
 /* void print_probes_data(void); */
-void print_probes_data2(void);
+// void print_probes_data2(void);
+void print_probe_data(int index);
 void print_packet(char *string, int len);
 
 // typedef struct 	s_pingData {
@@ -147,18 +152,16 @@ void print_packet(char *string, int len);
 // void			construct_packet(t_pingData *data);
 // void			send_packet(t_pingData *data, int sockFd);
 // bool			recieve_packet(t_pingData *data, int sockFd);
-// void			print_output_loop(t_pingData *data, bool recieved);
-// void			print_usage(char invalidFlag);
-// void			print_stats(int signum);
-// void			print_flood_protection(void);
-// void			reverseDNS(t_pingData *data);
-// void			set_median_arr(void);
-// double			find_average(void);
-// double			find_stddev(void);
-// double			convert_to_milliseconds(t_val time, t_val base);
-// bool			check_packet_data(t_pingData *data);
-// void			manage_time(t_pingData *data);
-// char*			get_ip_reverseDNS(t_pingData *data);
-// useconds_t		convert_to_microseconds(double seconds);
+// void			print_output_loop(t_pingData *data, bool
+// recieved); void			print_usage(char invalidFlag); void
+// print_stats(int signum); void
+// print_flood_protection(void); void			reverseDNS(t_pingData
+// *data); void			set_median_arr(void); double
+// find_average(void); double			find_stddev(void); double
+// convert_to_milliseconds(t_val time, t_val base); bool
+// check_packet_data(t_pingData *data); void
+// manage_time(t_pingData *data); char*
+// get_ip_reverseDNS(t_pingData *data); useconds_t
+// convert_to_microseconds(double seconds);
 
 #endif
