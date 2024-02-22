@@ -21,10 +21,3 @@ double convert_to_milliseconds(t_val time, t_val base) {
 
   return fMilli;
 }
-
-void store_times() {
-  for (int i = 0; i < 3; i++) {
-    data.probeTimes[i] =
-        convert_to_milliseconds(data.recieveTime[i], data.sendTime[i]);
-  }
-}

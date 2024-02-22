@@ -33,20 +33,24 @@ bool recieve_packet(int index) {
   gettimeofday(&data.recieveTime[index], NULL);
 
   if (data.retpack[index]->icmpHeader.type == 0) {
-    dprintf(1, "do we get a reply here?\n");
+    // dprintf(1, "do we get a reply here? should have reached dest ?\n");
+    data.alive = false;
   }
   // dprintf(1, "ret pack type = %d code =  %d\n",
   //         data.retpack[index]->icmpHeader.type,
   //         data.retpack[index]->icmpHeader.code);
   //
+  data.probeTimes[index] =
+      convert_to_milliseconds(data.recieveTime[index], data.sendTime[index]);
+  // dprintf(1, "time packet number %d = %lf\n", index, data.probeTimes[index]);
   return true;
 }
 
-void recieve_packets() {
-  ft_bzero(data.recieved, sizeof(bool) * 3);
-  for (int i = 0; i < 3; i++) {
-    data.recieved[i] = recieve_packet(i);
-  }
-  store_times();
-  // print_times();
-}
+// void recieve_packets() {
+//   ft_bzero(data.recieved, sizeof(bool) * 3);
+//   for (int i = 0; i < 3; i++) {
+//     data.recieved[i] = recieve_packet(i);
+//   }
+//   store_times();
+//   print_times();
+// }

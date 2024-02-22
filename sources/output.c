@@ -76,13 +76,14 @@ void get_address(int index) {
 
   if (!getnameinfo((struct sockaddr *)&temp, len, buff, sizeof(buff), NULL, 0,
                    NI_NAMEREQD)) {
+
     data.resDns[index] = ft_strdup(buff);
 
-    // dprintf(1, "res ip = %s\n", buff);
+    // dprintf(1, "dans get address resDns  = %s\n", buff);
   }
   inet_ntop(AF_INET, &packet->ipHeader.saddr, buff, INET_ADDRSTRLEN);
   data.resIps[index] = ft_strdup(buff);
-  // dprintf(1, "res ip = %s\n", buff);
+  // dprintf(1, "dans get address res ip = %s\n", data.resIps[index]);
 }
 
 void print_single_route() {
@@ -94,10 +95,32 @@ void print_single_route() {
 
 void print_route(int index) {
   get_address(index);
+  // dprintf(1, " resip[%d] %s | ", index, data.resIps[index]);
+  if (index != 0 &&
+      ft_strcmp(data.resIps[index], data.resIps[index - 1]) == 0) {
+    dprintf(1, "%.3lf ms ", data.probeTimes[index]);
+    return;
+  }
   char *target =
       (data.resDns[index] == NULL) ? data.resIps[index] : data.resDns[index];
   dprintf(1, "%s (%s) %.3lf ms ", target, data.resIps[index],
           data.probeTimes[index]);
+}
+
+void print_probe_data(int index) {
+  if (data.recieved[index] == false) {
+    dprintf(1, "* ");
+  } else {
+    print_route(index);
+  }
+  if (index == 2)
+    ft_putchar('\n');
+}
+
+void print_times() {
+  for (int i = 0; i < PROBENB; i++) {
+    dprintf(1, "time = %lf\n", data.probeTimes[i]);
+  }
 }
 
 // void check_dest_reached() {
@@ -111,33 +134,20 @@ void print_route(int index) {
 //   }
 // }
 
-void print_probes_data2() {
-  dprintf(1, "%d ", data.ttl);
-  // check_dest_reached();
-  if (check_one_route()) {
-    print_single_route();
-    return;
-  }
-  for (int i = 0; i < PROBENB; i++) {
-    if (data.recieved[i] == false) {
-      dprintf(1, "* ");
-      continue;
-    }
-    print_route(i);
-  }
-  ft_putchar('\n');
-}
-
-void print_probe_data(int index) {
-  if (data.recieved[index] == false) {
-    dprintf(1, "* ");
-    return;
-  }
-  print_route(index);
-}
-
-void print_times() {
-  for (int i = 0; i < PROBENB; i++) {
-    dprintf(1, "time = %lf\n", data.probeTimes[i]);
-  }
-}
+// void print_probes_data2() {
+//   dprintf(1, "%d ", data.ttl);
+//   // check_dest_reached();
+//   if (check_one_route()) {
+//     print_single_route();
+//     return;
+//   }
+//   for (int i = 0; i < PROBENB; i++) {
+//     if (data.recieved[i] == false) {
+//       dprintf(1, "* ");
+//       continue;
+//     }
+//     print_route(i);
+//   }
+//   ft_putchar('\n');
+// }
+//

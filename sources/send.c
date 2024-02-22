@@ -29,7 +29,6 @@ void construct_ip_header(struct iphdr *header) {
   header->check = 0;
   header->saddr = INADDR_ANY;
   header->daddr = data.networkIp->sin_addr.s_addr;
-  // checksum(&header-> sizeof(ipHdr));
 }
 
 void construct_icmp_header(struct icmphdr *header) {
@@ -38,42 +37,32 @@ void construct_icmp_header(struct icmphdr *header) {
   header->checksum = 0;
   header->un.echo.id = 0;
   header->un.echo.sequence = data.ttl;
-  // header->checksum = checksum(header, data.totalSize - data.payloadSize);
 }
 
 void *construct_packet(int index) {
-  // struct iphdr ipHdr;
-  // struct icmphdr icmpHdr;
-
   struct iphdr ipHdr;
   struct icmphdr icmpHdr;
-
-  // ft_bzero(&ipHdr, sizeof(struct iphdr));
-  // ft_bzero(&icmpHdr, sizeof(struct iphdr));
-
-  // ipHdrPtr = &ipHdr;
-  // icmpHdrPtr = &icmpHdr;
 
   construct_ip_header(&ipHdr);
   construct_icmp_header(&icmpHdr);
 
-  // char payload[] = "01234567";
+  char s[data.payloadSize];
+  ft_bzero(s, data.payloadSize);
   char *packet = (char *)malloc(data.totalSize);
+
   ft_memcpy(packet, &ipHdr, sizeof(struct iphdr));
   ft_memcpy(packet + sizeof(struct iphdr), &icmpHdr, sizeof(struct icmphdr));
-  // ft_memcpy(packet + sizeof(ipHdr) + sizeof(icmpHdr), &payload,
-  //           sizeof(payload));
+  ft_memcpy(packet + sizeof(struct iphdr) + sizeof(struct icmphdr), s,
+            data.payloadSize);
 
   return packet;
 }
 
 void construct_packets() {
-  // dprintf(1, "in construct packets gimme ttl %d\n", data.ttl);
   for (int i = 0; i < 3; i++) {
     if (data.ttl != 1 /* to remove && data.ttl != 7*/) {
       data.sendpack[i]->ipHeader.ttl = data.ttl;
     } else {
-      // dprintf(1, "wesh les uni %p\n", data.sendpack[i]);
       data.sendpack[i] = construct_packet(i);
     }
   }
@@ -89,9 +78,6 @@ void send_packet(int i) {
   if (bytesSent < 0) {
     dprintf(1, "bytes not sent for packet %d and ttl %d\n", i, data.ttl);
     perror("bytes not sent");
-  } else if (i == 0) {
-    // printf("bytes sent = %d\n", bytesSent);
-    // print_packet(data.sendpack[i], bytesSent);
   }
   gettimeofday(&data.sendTime[i], NULL);
 }

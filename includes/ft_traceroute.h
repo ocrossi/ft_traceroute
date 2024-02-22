@@ -98,7 +98,7 @@ void recieve_packets(void);
 bool recieve_packet(int index);
 
 /* UTILS */
-void store_times();
+double convert_to_milliseconds(t_val time, t_val base);
 void free_probes_data();
 void free_sendpackets_data();
 
