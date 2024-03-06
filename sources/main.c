@@ -3,9 +3,11 @@
 
 t_data data;
 
+void kill_program() { data.alive = false; }
+
 void set_signals() {
-  signal(SIGALRM, &print_interrupt);
-  signal(SIGINT, &print_interrupt);
+  signal(SIGALRM, &kill_program);
+  signal(SIGINT, &kill_program);
 }
 
 void init_data(void) {
@@ -55,21 +57,19 @@ void send_recieve() {
 }
 
 int main(int argc, char **argv) {
-  manage_args(argc, argv);
+  // manage_args(argc, argv);
   parse_dest(argc, argv);
   set_signals();
   init_data();
   print_head();
   data.alive = true;
   while (data.ttl <= MAX_HOPS && data.alive) {
-    // if (data.ttl == 4) {
-    //   data.alive = false;
-    // }
     construct_packets();
     send_recieve();
     free_probes_data();
     data.ttl++;
   }
+  free_probes_data();
   free_sendpackets_data();
   return EXIT_SUCCESS;
 }

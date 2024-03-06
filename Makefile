@@ -21,7 +21,7 @@ OBJS		= $(addprefix $(OBJ_PATH)/,$(NAME_OBJS))
 
 #compilateur + flags
 CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror -g #-fsanitize=address
+CFLAGS	= -Wall -Wextra -Werror #-fsanitize=address
 
 #librairies
 #LIBFT				= $(LIB_PATH)/libft.a
@@ -31,7 +31,7 @@ all: libft $(NAME)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) -L $(LIB_PATH) -I $(INC_PATH) $^ -o $@ $(LIB_PATH)/$(NAME_LIB)
-
+	# sudo setcap cap_net_raw=pe $(NAME) # removed for valgrind tests
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(HEADERS)
 	@mkdir $(OBJ_PATH) 2> /dev/null || true

@@ -26,6 +26,7 @@ void print_usage(void) {
   dprintf(1, "\ttraceroute <destination> [optional_packet_size]\n\n");
   dprintf(1, "Options:\n");
   dprintf(1, "\t--help\t\t\tRead this help and exit\n\n");
+  dprintf(1, "\t-I  --icmp \t\tRead this help and exit\n\n");
   dprintf(1, "Arguments:\n");
   dprintf(1, "+\thost\t\t\tThe host to traceroute to\n");
   dprintf(1, "\tpacketlen\t\tThe full packet length (default is the length of "

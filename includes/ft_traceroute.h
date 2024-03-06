@@ -30,20 +30,21 @@
 #define MAX_PACKET_SIZE 65000
 #define ONE_SEC 1000000
 #define MAX_HOPS 30
+#define UDP_PORT 33434
 
-// errors //
-#define EICMP_DEST_UNREACH "Destination Unreachable\n"
-#define EICMP_SOURCE_QUENCH "Source Quench\n"
-#define EICMP_REDIRECT "Redirect (change route)\n"
-#define EICMP_TIME_EXCEEDED "Time to live exceeded\n"
-#define EICMP_PARAMETERPROB "Parameter Problem\n"
-#define EICMP_TIMESTAMP "Timestamp Request"
-#define EICMP_TIMESTAMPREPLY "Timestamp Reply\n"
-#define EICMP_INFO_REQUEST "Information Request\n"
-#define EICMP_INFO_REPLY "Information Reply\n"
-#define EICMP_ADDRESS "Address Mask Request\n"
-#define EICMP_ADDRESSREPLY "Address Mask Reply\n"
-
+/* // errors // */
+/* #define EICMP_DEST_UNREACH "Destination Unreachable\n" */
+/* #define EICMP_SOURCE_QUENCH "Source Quench\n" */
+/* #define EICMP_REDIRECT "Redirect (change route)\n" */
+/* #define EICMP_TIME_EXCEEDED "Time to live exceeded\n" */
+/* #define EICMP_PARAMETERPROB "Parameter Problem\n" */
+/* #define EICMP_TIMESTAMP "Timestamp Request" */
+/* #define EICMP_TIMESTAMPREPLY "Timestamp Reply\n" */
+/* #define EICMP_INFO_REQUEST "Information Request\n" */
+/* #define EICMP_INFO_REPLY "Information Reply\n" */
+/* #define EICMP_ADDRESS "Address Mask Request\n" */
+/* #define EICMP_ADDRESSREPLY "Address Mask Reply\n" */
+/**/
 #define UNKNOWN_ERR_CODE "Unknown error code\n"
 
 #define PROBENB 3
@@ -53,9 +54,11 @@ typedef struct udphdr t_udp;
 typedef struct iphdr t_ip;
 
 typedef struct s_packetData {
-  struct iphdr ipHeader;     // 20 len
-  struct icmphdr icmpHeader; // 8 len
-  char payload[];
+  struct iphdr ipHeader; // 20 len
+  union {
+    struct icmphdr icmpHeader;
+    struct udphdr udpHdr;
+  };
 } t_packetData;
 
 typedef struct s_data {
@@ -76,6 +79,8 @@ typedef struct s_data {
   char *resDns[PROBENB];
   double probeTimes[PROBENB];
 
+  bool icmp_route;
+  int icmp_route_index;
   bool alive;
 } t_data;
 

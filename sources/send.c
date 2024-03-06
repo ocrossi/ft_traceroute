@@ -6,16 +6,16 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// uint16_t checksum(const void *data, size_t len) {
-//   uint32_t sum = 0;
-//   for (size_t i = 0; i < len; ++i) {
-//     sum += *(uint16_t *)((char *)data + i);
-//   }
-//   while (sum >> 16) {
-//     sum = (sum & 0xffff) + (sum >> 16);
-//   }
-//   return ~sum;
-// }
+uint16_t checksum(const void *data, size_t len) {
+  uint32_t sum = 0;
+  for (size_t i = 0; i < len; ++i) {
+    sum += *(uint16_t *)((char *)data + i);
+  }
+  while (sum >> 16) {
+    sum = (sum & 0xffff) + (sum >> 16);
+  }
+  return ~sum;
+}
 
 void construct_ip_header(struct iphdr *header) {
   header->ihl = 5;
@@ -32,35 +32,60 @@ void construct_ip_header(struct iphdr *header) {
 }
 
 void construct_icmp_header(struct icmphdr *header) {
+  printf("icmp header\n");
   header->type = ICMP_ECHO;
   header->code = 0;
-  header->checksum = 0;
   header->un.echo.id = 0;
   header->un.echo.sequence = data.ttl;
+  header->checksum = 0;
+  // header->checksum = checksum(data. , );
+}
+
+void construct_udp_header(struct udphdr *header, int port) {
+  printf("udp header\n");
+  header->source = INADDR_ANY;
+  header->dest = htons(port);                                    // port
+  header->len = htons(data.payloadSize + sizeof(struct udphdr)); //
+  header->check = 0;
+}
+
+void check(struct udphdr *header, int size) {
+  header->check = checksum(header, (size_t)size);
 }
 
 void *construct_packet(int index) {
+  char *packet = (char *)malloc(data.totalSize);
   struct iphdr ipHdr;
-  struct icmphdr icmpHdr;
 
   construct_ip_header(&ipHdr);
-  construct_icmp_header(&icmpHdr);
-
-  char s[data.payloadSize];
-  ft_bzero(s, data.payloadSize);
-  char *packet = (char *)malloc(data.totalSize);
-
   ft_memcpy(packet, &ipHdr, sizeof(struct iphdr));
-  ft_memcpy(packet + sizeof(struct iphdr), &icmpHdr, sizeof(struct icmphdr));
-  ft_memcpy(packet + sizeof(struct iphdr) + sizeof(struct icmphdr), s,
-            data.payloadSize);
+  if (data.icmp_route == true) {
+    struct icmphdr icmpHdr;
+    construct_icmp_header(&icmpHdr);
+    ft_memcpy(packet + sizeof(struct iphdr), &icmpHdr, sizeof(struct icmphdr));
+  } else {
+    struct udphdr udpHdr;
+    construct_udp_header(&udpHdr, UDP_PORT + index);
+    ft_memcpy(packet + sizeof(struct iphdr), &udpHdr, sizeof(struct udphdr));
+  }
+  char s[data.payloadSize + 1];
+  s[data.payloadSize] = '\0';
+  memset(s, 'A', data.payloadSize);
+  printf("payload [%s] for a size of %d\n", s, data.payloadSize);
+  ft_memcpy(packet + sizeof(t_packetData), s, data.payloadSize);
+
+  if (data.icmp_route == true) {
+    check((struct udphdr *)(packet + sizeof(struct iphdr)),
+          data.totalSize - sizeof(struct iphdr));
+  }
+  print_packet(packet, data.totalSize);
 
   return packet;
 }
 
 void construct_packets() {
   for (int i = 0; i < 3; i++) {
-    if (data.ttl != 1 /* to remove && data.ttl != 7*/) {
+    if (data.ttl != 1) {
       data.sendpack[i]->ipHeader.ttl = data.ttl;
     } else {
       data.sendpack[i] = construct_packet(i);
