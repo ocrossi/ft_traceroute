@@ -94,10 +94,10 @@ void print_single_route() {
           data.probeTimes[0], data.probeTimes[1], data.probeTimes[2]);
 }
 
-void print_route(int index) {
+void print_route(int index) { // segf here on strcmp
   get_address(index);
   // dprintf(1, " resip[%d] %s | ", index, data.resIps[index]);
-  if (index != 0 &&
+  if (index != 0 && data.recieved[index - 1] == true &&
       ft_strcmp(data.resIps[index], data.resIps[index - 1]) == 0) {
     dprintf(1, "%.3lf ms ", data.probeTimes[index]);
     return;

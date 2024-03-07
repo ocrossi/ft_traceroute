@@ -24,15 +24,16 @@ bool recieve_packet(int index) {
     // dprintf(1, "cant recieve do u get timeout here?\n");
     data.retpack[index] = NULL;
     return false;
+  } else if (index == 0) {
+    printf("recieved\n");
+    print_packet(recieve, bytesRecieved);
   }
-  // else if (index == 0) {
-  //   print_packet(recieve, bytesRecieved);
-  // }
   data.retpack[index] = (t_packetData *)malloc(bytesRecieved);
   ft_memcpy(data.retpack[index], recieve, bytesRecieved);
   gettimeofday(&data.recieveTime[index], NULL);
 
   if (data.retpack[index]->icmpHeader.type == 0) {
+    // check si ca marche pr les packets udp
     // dprintf(1, "do we get a reply here? should have reached dest ?\n");
     data.alive = false;
   }

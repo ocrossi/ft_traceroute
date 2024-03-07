@@ -12,3 +12,5 @@ allow for udp packet type
 
 ### check executable with sudo privileges
 sudo valgrind --leak-check=full ./ft_traceroute youtube.com
+
+https://www.malekal.com/protocole-tcp-udp-icmp-fonctionnement-et-differences/

@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -52,6 +53,15 @@
 typedef struct timeval t_val;
 typedef struct udphdr t_udp;
 typedef struct iphdr t_ip;
+
+typedef struct pseudo_ipHdr {
+  uint32_t source_addr;
+  uint32_t dest_addr;
+  uint8_t zeros;
+  uint8_t protocol;
+  uint16_t length;
+
+} f_ipHdr;
 
 typedef struct s_packetData {
   struct iphdr ipHeader; // 20 len

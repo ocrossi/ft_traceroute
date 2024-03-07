@@ -43,6 +43,7 @@ void free_sendpackets_data() {
       data.retpack[i] = NULL;
     }
   }
+  free(data.networkIp);
 }
 
 void send_recieve() {

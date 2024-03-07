@@ -12,7 +12,7 @@ void test_dest(char *arg) {
   hints.ai_socktype = SOCK_RAW;
   hints.ai_flags = 0;
 
-  printf("test dest %s\n", arg);
+  // printf("test dest %s\n", arg);
 
   if ((ret = getaddrinfo(arg, NULL, &hints, &res)) != 0) {
     fprintf(stderr, "%s: %s\n", arg, gai_strerror(ret));
@@ -79,17 +79,17 @@ int check_icmp_traceroute(int argc, char **argv) {
 }
 
 void manage_args(int argc, char **argv) {
-  printf("beginning %d, argc = %d\n", data.icmp_route, argc);
+  // printf("beginning %d, argc = %d\n", data.icmp_route, argc);
   check_help_flag(argc, argv);
   argc -= check_icmp_traceroute(argc, argv);
-  printf("beginning1 %d, argc = %d\n", data.icmp_route, argc);
+  // printf("beginning1 %d, argc = %d\n", data.icmp_route, argc);
   if (argc < 2) {
     print_usage();
   }
   if (argc >= 4) {
     print_incorrect_args(argv[3]);
   }
-  printf("end %d, argc = %d\n", data.icmp_route, argc);
+  // printf("end %d, argc = %d\n", data.icmp_route, argc);
 }
 
 void parse_dest(int argc, char **argv) {
