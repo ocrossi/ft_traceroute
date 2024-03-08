@@ -106,6 +106,10 @@ void print_route(int index) { // segf here on strcmp
       (data.resDns[index] == NULL) ? data.resIps[index] : data.resDns[index];
   dprintf(1, "%s (%s) %.3lf ms ", target, data.resIps[index],
           data.probeTimes[index]);
+  if (ft_strcmp(data.destIp, data.resIps[index]) == 0) {
+    // printf("arrived\n");
+    data.alive = false;
+  }
 }
 
 void print_probe_data(int index) {

@@ -53,20 +53,27 @@ void send_recieve() {
   for (int i = 0; i < PROBENB; i++) {
     send_packet(i);
     data.recieved[i] = recieve_packet(i);
+  }
+}
+
+void print_probes_output() {
+  for (int i = 0; i < PROBENB; i++) {
     print_probe_data(i);
   }
 }
 
 int main(int argc, char **argv) {
-  // manage_args(argc, argv);
   parse_dest(argc, argv);
   set_signals();
   init_data();
   print_head();
   data.alive = true;
+  construct_packets();
   while (data.ttl <= MAX_HOPS && data.alive) {
-    construct_packets();
+    if (data.ttl != 1)
+      update_packets();
     send_recieve();
+    print_probes_output();
     free_probes_data();
     data.ttl++;
   }

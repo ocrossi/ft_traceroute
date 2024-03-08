@@ -25,25 +25,22 @@ bool recieve_packet(int index) {
     data.retpack[index] = NULL;
     return false;
   } else if (index == 0) {
-    printf("recieved\n");
-    print_packet(recieve, bytesRecieved);
+    // printf("recieved\n");
+    // print_packet(recieve, bytesRecieved);
   }
   data.retpack[index] = (t_packetData *)malloc(bytesRecieved);
   ft_memcpy(data.retpack[index], recieve, bytesRecieved);
   gettimeofday(&data.recieveTime[index], NULL);
 
-  if (data.retpack[index]->icmpHeader.type == 0) {
-    // check si ca marche pr les packets udp
-    // dprintf(1, "do we get a reply here? should have reached dest ?\n");
+  if (data.icmp_route == true &&
+      data.retpack[index]->icmpHeader.type ==
+          0) { // est ce que ce serait pas de l overkill ici
     data.alive = false;
+  } else if (data.retpack[index]->udpHdr.source) {
   }
-  // dprintf(1, "ret pack type = %d code =  %d\n",
-  //         data.retpack[index]->icmpHeader.type,
-  //         data.retpack[index]->icmpHeader.code);
-  //
+
   data.probeTimes[index] =
       convert_to_milliseconds(data.recieveTime[index], data.sendTime[index]);
-  // dprintf(1, "time packet number %d = %lf\n", index, data.probeTimes[index]);
   return true;
 }
 

@@ -22,22 +22,6 @@ unsigned short checksum(void *b, int len) {
   return result;
 }
 
-uint16_t checksum_udp(uint8_t *data, unsigned int size) {
-  int i;
-  int sum = 0;
-  uint16_t *p = (uint16_t *)data;
-
-  for (i = 0; i < size; i += 2) {
-    sum += *(p++);
-  }
-
-  uint16_t carry = sum >> 16;
-  uint16_t tmp = 0x0000ffff & sum;
-  uint16_t res = ~(tmp + carry);
-
-  return res;
-}
-
 void construct_ip_header(struct iphdr *header) {
   header->ihl = 5;
   header->version = 4;
@@ -47,7 +31,6 @@ void construct_ip_header(struct iphdr *header) {
   header->frag_off = 0;
   header->ttl = data.ttl;
   header->protocol = data.icmp_route == true ? IPPROTO_ICMP : IPPROTO_UDP;
-  // header->protocol = IPPROTO_ICMP;
   header->check = 0;
   header->saddr = INADDR_ANY;
   header->daddr = data.networkIp->sin_addr.s_addr;
@@ -63,38 +46,10 @@ void construct_icmp_header(struct icmphdr *header) {
   header->checksum = checksum(header, size);
 }
 
-void construct_udp_header(void *packet, int port) {
-  f_ipHdr ipHdrInfo;
-  struct udphdr *header = packet + sizeof(struct iphdr);
-  struct iphdr *headerip = packet;
-  header->source = INADDR_ANY;
-  header->dest = htons(port);                                    // port
-  header->len = htons(data.payloadSize + sizeof(struct udphdr)); //
-
-  ipHdrInfo.source_addr = headerip->saddr;
-  ipHdrInfo.dest_addr = headerip->daddr;
-  ipHdrInfo.zeros = 0;
-  ipHdrInfo.protocol = IPPROTO_UDP;
-  ipHdrInfo.length = header->len;
-
-  int size_fake_packet =
-      data.payloadSize + sizeof(struct udphdr) + sizeof(f_ipHdr);
-
-  char *pseudo_packet = (char *)malloc(size_fake_packet);
-
-  ft_memcpy(pseudo_packet, &ipHdrInfo, sizeof(f_ipHdr));
-  ft_memcpy(pseudo_packet + sizeof(f_ipHdr), header,
-            size_fake_packet - sizeof(f_ipHdr));
-
-  // size_t size = data.totalSize - sizeof(struct udphdr);
-  header->check = checksum_udp((uint8_t *)pseudo_packet, size_fake_packet);
-  // header->check = 0;
-}
-
-void construct_udp_header2(struct udphdr *header, int port) {
-  printf("WHU UDP WHYYY\n");
-  header->source = INADDR_ANY;
-  header->dest = htons(port);                                    // port
+void construct_udp_header(struct udphdr *header, int port_s, int port_d) {
+  // printf("WHY UDP WHYYY, port %d\n", port);
+  header->source = htons(port_s);
+  header->dest = htons(port_d);                                  // port
   header->len = htons(data.payloadSize + sizeof(struct udphdr)); //
   header->check = 0;
 }
@@ -106,7 +61,8 @@ void *construct_packet(int index) {
   ft_bzero(packet, data.totalSize);
   ft_memset(packet + offset, 'A', data.payloadSize);
   packet[data.totalSize - 1] = '\0';
-  printf("payload [%s] for a size of %d\n", &packet[offset], data.payloadSize);
+  // printf("payload [%s] for a size of %d\n", &packet[offset],
+  // data.payloadSize);
 
   construct_ip_header((struct iphdr *)packet);
   // ft_memcpy(packet, &ipHdr, sizeof(struct iphdr));
@@ -115,18 +71,25 @@ void *construct_packet(int index) {
     construct_icmp_header(addrHdr);
   } else {
     struct udphdr *addrHdr = (struct udphdr *)&packet[sizeof(struct iphdr)];
-    construct_udp_header2(addrHdr, UDP_PORT + index);
-    // construct_udp_header(packet, UDP_PORT + index);
+    construct_udp_header(addrHdr, UDP_PORT_S + index, UDP_PORT_D + index);
   }
   return packet;
 }
 
 void construct_packets() {
   for (int i = 0; i < 3; i++) {
-    if (data.ttl != 1) {
-      data.sendpack[i]->ipHeader.ttl = data.ttl;
-    } else {
-      data.sendpack[i] = construct_packet(i);
+    data.sendpack[i] = construct_packet(i);
+  }
+}
+
+void update_packets() {
+  for (int i = 0; i < 3; i++) {
+    data.sendpack[i]->ipHeader.ttl = data.ttl;
+    if (data.icmp_route == false) {
+      int new_port_d = UDP_PORT_D + i + (data.ttl - 1) * 3;
+      int new_port_s = UDP_PORT_S + i + (data.ttl - 1) * 3;
+      data.sendpack[i]->udpHdr.source = htons(new_port_s);
+      data.sendpack[i]->udpHdr.dest = htons(new_port_d);
     }
   }
 }
@@ -139,30 +102,12 @@ void send_packet(int i) {
       sendto(data.sockFd, data.sendpack[i], data.totalSize, 0,
              (struct sockaddr *)data.networkIp, sizeof(struct sockaddr_in));
   if (bytesSent < 0) {
-    dprintf(1, "bytes not sent for packet %d and ttl %d\n", i, data.ttl);
+    // dprintf(1, "bytes not sent for packet %d and ttl %d\n", i, data.ttl);
     perror("bytes not sent");
   } else {
-    printf("%d sent\n", i);
+    // printf("%d sent\n", i);
   }
   gettimeofday(&data.sendTime[i], NULL);
-  dprintf(1, "packet sent\n");
-  print_packet((char *)data.sendpack[i], data.totalSize);
+  // dprintf(1, "packet sent\n");
+  // print_packet((char *)data.sendpack[i], data.totalSize);
 }
-
-// void send_packets() {
-//   dprintf(1, "gimme current ttl %d\n", data.ttl);
-//   for (int i = 0; i < 3; i++) {
-//     int bytesSent =
-//         sendto(data.sockFd, data.sendpack[i], data.totalSize, 0,
-//                (struct sockaddr *)data.networkIp, sizeof(struct
-//                sockaddr_in));
-//     if (bytesSent < 0) {
-//       dprintf(1, "bytes not sent for packet %d and ttl %d\n", i, data.ttl);
-//       perror("bytes not sent");
-//     } else if (i == 0) {
-//       // printf("bytes sent = %d\n", bytesSent);
-//       // print_packet(data.sendpack[i], bytesSent);
-//     }
-//     gettimeofday(&data.sendTime[i], NULL);
-//   }
-// }

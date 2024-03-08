@@ -31,7 +31,8 @@
 #define MAX_PACKET_SIZE 65000
 #define ONE_SEC 1000000
 #define MAX_HOPS 30
-#define UDP_PORT 33434
+#define UDP_PORT_D 33434
+#define UDP_PORT_S 33434
 
 /* // errors // */
 /* #define EICMP_DEST_UNREACH "Destination Unreachable\n" */
@@ -105,6 +106,7 @@ void create_socket(void);
 
 /* CONSTRUCT & SEND */
 void construct_packets(void);
+void update_packets(void);
 void send_packets(void);
 void send_packet(int index);
 

@@ -14,3 +14,5 @@ allow for udp packet type
 sudo valgrind --leak-check=full ./ft_traceroute youtube.com
 
 https://www.malekal.com/protocole-tcp-udp-icmp-fonctionnement-et-differences/
+https://datatracker.ietf.org/doc/html/rfc768
+UDP protocol doc offi
